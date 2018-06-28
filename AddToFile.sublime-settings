@@ -11,7 +11,7 @@
     "show_status_message": true,
 
     // show file path in the popup menu instead of the file name
-    "show_file_path": false,
+    "show_file_path": true,
 
     // choose custom status message:
     //
@@ -45,10 +45,10 @@
 
     // keep the view focus on the file being copied from
     // instead of switching to the destination file
-    "keep_focus": true,
+    "keep_focus": false,
 
     // show preview of file contents in popup menu
-    "show_preview": false,
+    "show_preview": true,
 
     // scroll the view to the end of the file being copied to
     // requires 'keep_focus' to be false

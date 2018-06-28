@@ -28,6 +28,7 @@ class AddToCommand(sublime_plugin.TextCommand):
                 # add the line contents to list
                 length += len(view.substr(view.line(length))) + 1
                 # record the cumulative character count to get each line
+                # and make up +1 for newline character
 
         else:
             items = ['' for _ in range(3)]
@@ -124,6 +125,8 @@ class AddToCommand(sublime_plugin.TextCommand):
         self.items = self.get_items()
         # add list of views, excluding the current view
 
+        # self.view.run_command('change_preview')
+
         if new_file is True:
             self.on_done('New File')  # automatically run on_done with value
             # New File to override method
@@ -143,11 +146,19 @@ class AddToCommand(sublime_plugin.TextCommand):
             # in settings
 
         if settings.get('show_preview', False):
-            self.view_content = [self.get_contents(view)
-                                 for view in sublime.active_window().views()
-                                 if view != sublime.active_window().active_view()]
-            # get a list of starting content of the open views
-            # excluding the current view
+            # self.view_content = [self.get_contents(view)
+            #                      for view in sublime.active_window().views()
+            #                      if view != sublime.active_window().active_view()]
+            # # get a list of starting content of the open views
+            # # excluding the current view
+            self.view_content = []
+            for view in sublime.active_window().views():
+                if view != sublime.active_window().active_view():
+                    if view.settings().get('preview_lines') is not None:
+                        self.view_content.append(view.settings().get('preview_lines'))
+                    else:
+                        self.view_content.append(self.get_contents(view))
+            print('-->', self.view_content)
 
             self.popup = []
 
@@ -209,3 +220,24 @@ class AddToNewFileCommand(sublime_plugin.TextCommand):
         # called by command: "add_to_new_file", but theoretically could also be
         # caled by  command: "add_to", args: {"new_file": true}
         # in JSON
+
+
+class ChangePreviewCommand(sublime_plugin.TextCommand):
+    def run(self, edit):
+        settings = self.view.settings()
+        length = self.view.line(self.view.sel()[0]).begin()
+        # sets the start length to the begin point of the line
+        # in which the first cursor is
+        items = []
+        for _ in range(3):
+            items.append(self.view.substr(self.view.line(length)))
+            # add the line contents to list
+            length += len(self.view.substr(self.view.line(length))) + 1
+            # record the cumulative character count to get each line
+        # print(items)
+        settings.set('preview_lines', items)
+
+
+class GetPreviewCommand(sublime_plugin.TextCommand):
+    def run(self, edit):
+        pass
