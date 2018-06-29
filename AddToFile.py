@@ -5,21 +5,44 @@ import sublime_plugin
 
 
 class AddToCommand(sublime_plugin.TextCommand):
+    """main AddToFile command which handles display and selection
+    of views and runs command to insert text
+
+    contains various methods to help separate functions provided"""
+
+    def get_preview(self, view):
+        """get the actual preview lines to be shown in file selection
+
+        returns list of strings"""
+        if isinstance(view, sublime.View):
+            return view.settings().get('preview_lines',
+                                       self.get_contents(view))
+        else:
+            return self.get_contents(self, view)
+            # send the invald view to this method as it handles
+            # non-view arguements passed
 
     def get_items(self):
+        """return list of active view objects except the current view"""
         return [view for view in sublime.active_window().views()
                 # if view.file_name()
                 if view != sublime.active_window().active_view()]
 
     def get_view_path(self, view):
+        """return the full file path of the view passed"""
         try:
             return view.file_name()
             # return a the 'unsplit' file path
 
         except (AttributeError, TypeError):
             return os.path.join('untitled', 'untitled')
+            # use os.path.join() to use the correct backslash
+            # or forward slash depending on platform
 
     def get_contents(self, view):
+        """get the content of the first 3 lines of a view
+
+        returns a list of strings"""
         length = 0
         if isinstance(view, sublime.View):
             items = []
@@ -36,14 +59,17 @@ class AddToCommand(sublime_plugin.TextCommand):
         return items
 
     def split_view_path(self, view):
+        """return the split view path of the passed view"""
         try:
             return list(os.path.split(view.file_name()))
             # return a list containing [path, file]
 
         except (AttributeError, TypeError):
             return ['untitled', 'untitled']
+            # handling non-view values
 
     def get_split_view_paths(self, views):
+        """call split_view_path on a list of views"""
         return [self.split_view_path(view) for view in views]
         # returnlist = []
         # for item in views:
@@ -51,9 +77,13 @@ class AddToCommand(sublime_plugin.TextCommand):
         # return returnlist
 
     def get_view_paths(self, views):
+        """return the full file path for a list of views"""
         return [view.file_name() for view in views]
 
     def on_done(self, val):
+        """handles inserting text, status bar messages, creation
+        of new files and view switching/scrolling"""
+
         settings = sublime.load_settings('AddToFile.sublime-settings')
         v = sublime.active_window().active_view()  # save the starting view
 
@@ -114,6 +144,7 @@ class AddToCommand(sublime_plugin.TextCommand):
                                                 {"msg": string})
 
     def run(self, edit, new_file=False):
+        """handles display of popup with correct data specified in settings"""
         settings = sublime.load_settings('AddToFile.sublime-settings')
         # load settings file
 
@@ -151,14 +182,9 @@ class AddToCommand(sublime_plugin.TextCommand):
             #                      if view != sublime.active_window().active_view()]
             # # get a list of starting content of the open views
             # # excluding the current view
-            self.view_content = []
-            for view in sublime.active_window().views():
-                if view != sublime.active_window().active_view():
-                    if view.settings().get('preview_lines') is not None:
-                        self.view_content.append(view.settings().get('preview_lines'))
-                    else:
-                        self.view_content.append(self.get_contents(view))
-            print('-->', self.view_content)
+            self.view_content = [self.get_preview(view)
+                                 for view in sublime.active_window().views()
+                                 if view != sublime.active_window().active_view()]
 
             self.popup = []
 
@@ -184,23 +210,44 @@ class AddToCommand(sublime_plugin.TextCommand):
             # 'override' addition of a path to self.paths by creating
             # a mock path called 'New File / New File'
 
-        if settings.get('show_preview', False):
-            sublime.active_window().show_quick_panel(self.popup,
-                                                     self.on_done)
-            # create popup with the *file name + preview* if specified in settings
-        elif settings.get('show_file_path', False):
-            sublime.active_window().show_quick_panel([path
-                                                      for path in self.paths],
-                                                     self.on_done)
-            # create popup with the *file paths* if specified in settings
+        if settings.get('show_popup', False):
+            # continue if the simple popup option is specified
+            # (file previews ignored)
+            if settings.get('show_file_path', False):
+                self.view.show_popup_menu([path
+                                           for path in self.paths],
+                                          self.on_done)
+                # create popup with the *file paths* if specified in settings
+            else:
+                # create popup with the *file names* if specified in settings
+                self.view.show_popup_menu([path[1]
+                                           for path in self.paths],
+                                          self.on_done)
+
         else:
-            sublime.active_window().show_quick_panel([path[1]
-                                                      for path in self.paths],
-                                                     self.on_done)
-            # create popup with the *file names* if specified in settings
+            if settings.get('show_preview', False):
+                sublime.active_window().show_quick_panel(self.popup,
+                                                         self.on_done)
+                # create popup with the *file name + preview* if specified in settings
+            elif settings.get('show_file_path', False):
+                sublime.active_window().show_quick_panel([path
+                                                          for path in self.paths],
+                                                         self.on_done)
+                # create popup with the *file paths* if specified in settings
+            else:
+                sublime.active_window().show_quick_panel([path[1]
+                                                          for path in self.paths],
+                                                         self.on_done)
+                # create popup with the *file names* if specified in settings
+                self.view.show_quick_panel([path[1]
+                                           for path in self.paths],
+                                          self.on_done)
 
 
 class InsertToEndCommand(sublime_plugin.TextCommand):
+    """insert text to the end of the given view
+
+    'lines' parameter is a list of strings to be added"""
     def run(self, edit, lines):
         for line in lines:
             # insert lines to end of file
@@ -209,12 +256,16 @@ class InsertToEndCommand(sublime_plugin.TextCommand):
 
 
 class AddStatusBarMsg(sublime_plugin.WindowCommand):
+    """set the status bar message to the given string"""
     def run(self, msg):
         # set the status bar message
         sublime.status_message(msg)
 
 
 class AddToNewFileCommand(sublime_plugin.TextCommand):
+    """runs add_to command with parameter new_file as true to override
+    behaviour and directly copy selection to a new file instead of having
+    to manually select it from the selection panel"""
     def run(self, edit):
         sublime.active_window().active_view().run_command('add_to', {"new_file": True})
         # called by command: "add_to_new_file", but theoretically could also be
@@ -223,6 +274,10 @@ class AddToNewFileCommand(sublime_plugin.TextCommand):
 
 
 class ChangePreviewCommand(sublime_plugin.TextCommand):
+    """set the lines to be previewed to the 3 lines from the lines
+    where the first selection begins
+
+    sets the setting 'preview_lines' of the view's individual settings"""
     def run(self, edit):
         settings = self.view.settings()
         length = self.view.line(self.view.sel()[0]).begin()
@@ -236,8 +291,25 @@ class ChangePreviewCommand(sublime_plugin.TextCommand):
             # record the cumulative character count to get each line
         # print(items)
         settings.set('preview_lines', items)
+        # set the view-specific preview to the lines at the first cursor
 
 
 class GetPreviewCommand(sublime_plugin.TextCommand):
+    """scroll the view to show the lines which will be previewed
+
+    returns the 3 lines as a list of strings"""
+
     def run(self, edit):
-        pass
+        # 'user interface' style command which scrolls the view
+        # to show the lines which are previewed
+        # sublime.message_dialog(', '.join(self.view.settings().get('preview_lines', [])))
+        self.view.show(
+            self.view.find(
+                self.view.settings().get('preview_lines', [])[0],
+                0).begin())
+        # scroll the view to the begin point of the first line that
+        # will be previewed
+        return self.view.settings().get('preview_lines',
+                                        AddToCommand.get_contents(self, self.view))
+        # return the individual view's settings of what 3 lines to preview,
+        # if there is no preview set, use the standard preview from line 1
