@@ -22,5 +22,13 @@
     {
         "caption": "AddToFile: Add to New File",
         "command": "add_to_new_file"
+    },
+    {
+        "caption": "AddToFile: Set preview lines",
+        "command": "change_preview"
+    },
+    {
+        "caption": "AddToFile: Show preview lines",
+        "command": "get_preview"
     }
 ]
