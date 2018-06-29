@@ -30,6 +30,7 @@ Setting                    | Description
 `keep_focus`               |Keep the **focus on the source file** when copying rather than switching to the destination file's view. Defaults to true.
 `show_preview`             |Show a **3-line file preview** in the file selection panel. Defaults to false.
 `scroll_view`              |**Scroll the view** to where the text was copied. Defaults to true. <sup id="text4">[[4]](#footnote4)</sup>
+`show_popup`               |Show a popup at the cursor instead of a selection panel. Defaults to false. <sup id="text5">[[5]](#footnote5)</sup>
 
 <a name="footnote1">1</a>: This will not work if `add_to_suggest_new_file` is set to true as this adds another element to the file list. Even if there is no other view open and 'New File' is the only item in the list, the panel will still open to ensure that a new file isn't accidentally created. [↑](#text1)
 
@@ -50,6 +51,7 @@ Segment     |Description
 
 <a name="footnote4">4</a>: `keep_focus` must be set to false to allow the view to switch.  [↑](#text4)
 
+<a name="footnote5">5</a>: File previews will not be shown and `show_preview` setting will be ignored
 
 ### Command Palette<a name="commandpalette"></a>
 
@@ -61,6 +63,8 @@ Command                                |Description
  `Preferences: AddToFile Settings`     |Edit AddToFile user settings
  `Preferences: AddToFile Key Bindings` |Edit AddToFile key binding
  `AddToFile: Add to New File`          |Run AddToFile command, but explicitly specifying to create a new file
+ `AddToFile: Change preview lines`     |Set the lines to preview to the 3 lines starting from the first cursor point (Limited to the view's individual settings so will reset on the closing of the view)
+ `AddToFile: Get preview lines`        |Scroll the view to to show the lines which will be previewed
 
 
 ### Context Menu
@@ -93,12 +97,3 @@ AddToFile can be installed manually:
 Using package control:
 1. Open package control
 2. Type `AddToFile`
-
-
-### TODO:
-
-- [x] test what `add_to_single_view` will do if there is no other view and `add_to_suggest_new_file` is set to true.
-- [x] test what happens if `show_file_path` is set to true and there are 2 views with the same name in different directories.
-- [x] add `{dir}` in `status message` and replace `{path}`.
-- [x] implement `keep_focus` as false and not just true.
-- [x] amend default values in AddToFile.sublime-settings.
