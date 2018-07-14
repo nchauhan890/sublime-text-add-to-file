@@ -31,10 +31,11 @@ Setting                    | Description
 `show_preview`             |Show a **3-line file preview** in the file selection panel. Defaults to false.
 `scroll_view`              |**Scroll the view** to where the text was copied. Defaults to true. <sup id="text4">[[4]](#footnote4)</sup>
 `show_popup`               |Show a popup at the cursor instead of a selection panel. Defaults to false. <sup id="text5">[[5]](#footnote5)</sup>
+`auto_smart`               |Show a **smart preview** of files open in the file selection panel. Defaults to false. <sup id="text6">[[6]](#footnote6)</sup>
 
-<a name="footnote1">1</a>: This will not work if `add_to_suggest_new_file` is set to true as this adds another element to the file list. Even if there is no other view open and 'New File' is the only item in the list, the panel will still open to ensure that a new file isn't accidentally created. [↑](#text1)
+<a name="footnote1">1</a>: This will not work if `add_to_suggest_new_file` is set to true as this adds another element to the file list. Even if there is no other view open and `New File` is the only item in the list, the panel will still open to ensure that a new file isn't accidentally created. [↑](#text1)
 
-<a name="footnote2">2</a>: If there are two files called 'AddToFile.py' in different directories, the file selection panel will display 'AddToFile.py' twice if this setting is set to false. However, the order that appears in the selection panel is the order of the view tabs from left to right which means the files could be distinguished by looking at which one's view tab is furthest left/right. [↑](#text2)
+<a name="footnote2">2</a>: If there are two files called `AddToFile.py` in different directories, the file selection panel will display `AddToFile.py` twice if this setting is set to false. However, the order that appears in the selection panel is the order of the view tabs from left to right which means the files could be distinguished by looking at which one's view tab is furthest left/right. [↑](#text2)
 
 <a name="footnote3">3</a>: Can include `{name}`, `{path}`, `{dir}`, `{sourcename}`, `{sourcepath}` and `{sourcedir}` which will be replaced with their corresponding values:
 
@@ -51,7 +52,9 @@ Segment     |Description
 
 <a name="footnote4">4</a>: `keep_focus` must be set to false to allow the view to switch.  [↑](#text4)
 
-<a name="footnote5">5</a>: File previews will not be shown and `show_preview` setting will be ignored
+<a name="footnote5">5</a>: File previews will not be shown and `show_preview` setting will be ignored  [↑](#text5)
+
+<a name="footnote6">6</a>: Usually, file names are shown on their own, however, if there are multiple files with the same name, a folder will be shown in brackets: the folder name is the first folder in the 2 conflicting file paths whose name is different. E.g. `(GitHub) AddToFile.py` and `(Documents) AddToFile.py` would be shown for 2 files in directories `GitHub/AddToFile/AddToFile.py` and `Documents/AddToFile/AddToFile.py`  [↑](#text6)
 
 ### Command Palette<a name="commandpalette"></a>
 
@@ -65,6 +68,7 @@ Command                                |Description
  `AddToFile: Add to New File`          |Run AddToFile command, but explicitly specifying to create a new file
  `AddToFile: Change preview lines`     |Set the lines to preview to the 3 lines starting from the first cursor point (Limited to the view's individual settings so will reset on the closing of the view)
  `AddToFile: Get preview lines`        |Scroll the view to to show the lines which will be previewed
+ `AddToFile: Add to... (smart)`        |Run AddToFile command, but the version that would be run if `auto_smart` in settings was enabled
 
 
 ### Context Menu
@@ -85,6 +89,7 @@ Key Binding              |Command
 ------------------------:|--------------
  `f8`                    |Run `add_to` command
  `ctrl+f8` (OSX `cmd+f8`)|Run `add_to_new_file` command
+ `shift+f8`              |Run `smart_add_to` command
 
 ### Installation
 
@@ -95,5 +100,5 @@ AddToFile can be installed manually:
 4. Move to the `Packages` directory which can be opened through `Preferences --> Browse Packages...`
 
 Using package control:
-1. Open package control
+1. Open [Package Control](https://packagecontrol.io/ "Package Control")
 2. Type `AddToFile`
