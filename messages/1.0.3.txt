@@ -1,0 +1,19 @@
+1.0.3
+-----
+
+- added show_popup setting to show a popup at the cursor instead of
+  a selection panel
+- added change_preview and get_preview commands (inaccessible by user) to set
+  which 3 lines are shown in the file selection panel - custom setting is valid
+  per view and resets once the view is closed. (Commands can be accessed
+  through the command palette):
+    - change_preview corresponds to Set preview lines in the command palette
+      which will set the lines to be previewed to the 3 lines starting at where
+      the first cursor currently is.
+    - get_preview corresponds to Show preview lines in the command palette
+      which will scroll the current view to show the lines which will be
+      previewed. By default the first 3 lines of the file is the preview if no
+      custom preview has been set for the view. Not an entirely useful command,
+      but it may have a use.
+- added documentation/docstrings into AddToFile.py to ease
+  debugging and readability
